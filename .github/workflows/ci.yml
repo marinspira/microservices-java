@@ -1,5 +1,9 @@
 name: CI/CD Microservices to Azure
 
+permissions:
+  id-token: write
+  contents: read
+
 on:
   push:
     branches:
@@ -77,10 +81,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
-          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ env.AZURE_CLIENT_SECRET }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy ${{ matrix.app_name }}
         run: |
