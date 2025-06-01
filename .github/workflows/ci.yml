@@ -83,12 +83,18 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Update ingress for ${{ matrix.app_name }}
+        run: |
+          az containerapp ingress update \
+            --name ${{ matrix.app_name }} \
+            --resource-group microservices-rg \
+            --target-port ${{ matrix.port }}
+
       - name: Deploy ${{ matrix.app_name }}
         run: |
           az containerapp update \
             --name ${{ matrix.app_name }} \
             --resource-group microservices-rg \
             --image ${{ matrix.docker_image }}:latest \
-            --target-port ${{ matrix.port }} \
             --cpu 0.25 \
             --memory 0.5Gi
