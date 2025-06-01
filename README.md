@@ -37,8 +37,9 @@ java -jar target/product-service-0.0.1-SNAPSHOT.jar
 
 ```bash
 docker compose up --build
-🧪 Manual Build and Push
 ```
+
+# 🧪 Manual Build and Push
 
 ## Generate JAR with Maven
 ```bash
