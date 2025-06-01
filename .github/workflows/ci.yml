@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service:
+        include:
           - name: user-service
             docker_image: marinspira/user-service
             app_name: user-service
@@ -22,7 +22,7 @@ jobs:
           - name: product-service
             docker_image: marinspira/product-service
             app_name: product-service
-            port: 8080
+            port: 8081
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -30,42 +30,45 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # 3) Setup Java 21
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
 
-      # 4) Build JAR with Maven
-      - name: Build JAR (${{ matrix.service.name }})
-        working-directory: ${{ matrix.service.name }}
+      - name: Build JAR (${{ matrix.name }})
+        working-directory: ${{ matrix.name }}
         run: mvn clean package -DskipTests
 
-      # 5) Login Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ env.DOCKERHUB_TOKEN }}
 
-      # 6) Build image Docker
-      - name: Build Docker image ({{ matrix.service.docker_image }})
-        working-directory: ${{ matrix.service.name }}
+      - name: Build Docker image (${{ matrix.docker_image }})
+        working-directory: ${{ matrix.name }}
         run: |
           docker build \
-            -t ${{ matrix.service.docker_image }}:latest \
+            -t ${{ matrix.docker_image }}:latest \
             .
 
-      # 7) Push image Docker Hub
       - name: Push Docker image
-        run: |
-          docker push ${{ matrix.service.docker_image }}:latest
+        run: docker push ${{ matrix.docker_image }}:latest
 
   deploy-to-azure:
     name: Deploy to Azure Container Apps
     runs-on: ubuntu-latest
     needs: build-and-push
+    strategy:
+      matrix:
+        include:
+          - app_name: user-service
+            docker_image: marinspira/user-service
+            port: 8080
+          - app_name: product-service
+            docker_image: marinspira/product-service
+            port: 8081
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -75,7 +78,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # 9) Login Azure
       - name: Azure Login
         uses: azure/login@v1
         with:
@@ -84,24 +86,16 @@ jobs:
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
           client-secret: ${{ env.AZURE_CLIENT_SECRET }}
 
-      # 10) Deploy (update) user-service
-      - name: Update Container App: user-service
+      - name: Update Container App: ${{ matrix.app_name }}
         run: |
           az containerapp update \
-            --name user-service \
+            --name ${{ matrix.app_name }} \
             --resource-group microservices-rg \
-            --image marinspira/user-service:latest \
-            --target-port 8080 \
+            --image ${{ matrix.docker_image }}:latest \
             --cpu 0.25 \
             --memory 0.5Gi
 
-      # 11) Deploy (update) product-service
-      - name: Update Container App: product-service
-        run: |
-          az containerapp update \
-            --name product-service \
+          az containerapp ingress update \
+            --name ${{ matrix.app_name }} \
             --resource-group microservices-rg \
-            --image marinspira/product-service:latest \
-            --target-port 8081 \
-            --cpu 0.25 \
-            --memory 0.5Gi
+            --target-port ${{ matrix.port }}
