@@ -39,7 +39,3 @@ jobs:
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
           client-secret: ${{ env.AZURE_CLIENT_SECRET }}
 
-      - name: Update Container App: ${{ matrix.app_name }}
-        run: |
-          az containerapp update --name ${{ matrix.app_name }} --resource-group microservices-rg --image ${{ matrix.docker_image }}:latest --cpu 0.25 --memory 0.5Gi
-          az containerapp ingress update --name ${{ matrix.app_name }} --resource-group microservices-rg --target-port ${{ matrix.port }}
