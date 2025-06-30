@@ -1,3 +1,52 @@
-.vscode
-application.properties
+# Diretórios de build
+/target/
+!/src/main/resources/static/
+
+# Arquivos temporários do sistema
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDEs
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# VS Code
+.vscode/
+
+# Arquivos do Maven
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+
+# Wrapper executável
+mvnw
+mvnw.cmd
+**/target/
+
+# Arquivos de configuração sensíveis
+.env
+*.properties
 application-dev.properties
+application-local.properties
+application-test.properties
+application-prod.properties
+
+# Evita subir credenciais ou configs locais
+*.key
+*.pem
+*.crt
+*.jks
