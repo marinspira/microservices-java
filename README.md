@@ -1,4 +1,4 @@
-# 🧩 Microservices Deployment – Java + Spring Boot + Docker + Azure Container Apps
+# 🧩 Microservices – Java + Spring Boot + Docker + Azure Container Apps
 
 This project demonstrates a basic microservices architecture using Java 21, Spring Boot, and Maven. The services are containerized with Docker and automatically deployed to Azure Container Apps using GitHub Actions.
 
