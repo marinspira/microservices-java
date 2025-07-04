@@ -15,6 +15,9 @@ This project demonstrates a basic microservices architecture using Java 21, Spri
 
 ![Azure Container Apps Screenshot](./screenshots/azure-container-apps-dashboard.jpeg)
 
+**Run logs:**
+`az containerapp logs show --n user-service -g microservices-rg --follow`
+
 ---
 
 ## 🌐 Public Endpoints (For Testing)
